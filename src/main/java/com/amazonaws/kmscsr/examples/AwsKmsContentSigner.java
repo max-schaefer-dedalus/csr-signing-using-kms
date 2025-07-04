@@ -37,6 +37,8 @@ public class AwsKmsContentSigner implements ContentSigner {
             // https://docs.aws.amazon.com/kms/latest/developerguide/asymmetric-key-specs.html
             case "ECDSA_SHA_256":
                 return algorithmIdentifier.find("SHA256WITHECDSA");
+            case "RSASSA_PSS_SHA_512":
+                return algorithmIdentifier.find("SHA512withRSAandMGF1");
 
             default:
                 System.out.println("Signing Algorithm " + signingAlgorithm + " is not supported. Exiting ...");

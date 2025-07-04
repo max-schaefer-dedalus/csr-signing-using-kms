@@ -83,6 +83,8 @@ public class CsrCreator {
         // This code has been tested for Elliptic Curve algorithm. You may extend it for additional algorithms.
         if (signingAlgorithm.startsWith("EC")) {
             return "EC";
+        } else if (signingAlgorithm.startsWith("RSA")) {
+          return "RSA";
         }
 
         String errMsg = "Signing Algorithm " + signingAlgorithm + " is not supported. " +
@@ -201,6 +203,9 @@ public class CsrCreator {
         // https://docs.aws.amazon.com/kms/latest/developerguide/asymmetric-key-specs.html
         if (awsKeySpec.equals("ECC_NIST_P256")) {
             return "ECDSA_SHA_256";
+        } else if (awsKeySpec.equals("RSA_4096")) {
+            return "RSASSA_PSS_SHA_512";
+            //return "RSASSA_PKCS1_V1_5_SHA_512";
         }
         throw new IllegalArgumentException("AWS Key Spec " + awsKeySpec + " is not supported");
     }
