@@ -6,12 +6,18 @@ node('SHARED&&WINDOWS64') { // fix on node HOCI_BUILD because can access shared 
             disableConcurrentBuilds(),
             disableResume(),
             parameters([string(description: 'AWS KMS Key ARN',
-                                      name: 'aws_key_arn', trim: true, defaultValue: 'arn:aws:kms:your-aws-region:012345678901:key/your-key-id'),
-                        choice(choices: ['RSA_4096', 'ECC_NIST_P256'], name: 'aws_key_spec')
+                                      name: 'aws_key_arn',
+                                      trim: true,
+                                      defaultValue: 'arn:aws:kms:your-aws-region:012345678901:key/your-key-id'),
+                        choice(choices: ['RSA_4096', 'ECC_NIST_P256'], name: 'aws_key_spec'),
                         string(description: 'certificate common name (CN)',
-                                      name: 'cert_common_name', trim: true, defaultValue: 'examplecorp.com'),
+                                      name: 'cert_common_name',
+                                      trim: true,
+                                      defaultValue: 'examplecorp.com'),
                         string(description: 'country code (C)',
-                                      name: 'cert_country_code', trim: true, defaultValue: 'US')])
+                                      name: 'cert_country_code',
+                                      trim: true,
+                                      defaultValue: 'US')])
   ])
   env.JENKINS_MAVEN_AGENT_DISABLED = 'true'
   ws {
