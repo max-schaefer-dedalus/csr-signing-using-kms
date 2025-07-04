@@ -24,6 +24,15 @@ node('SHARED&&WINDOWS64') { // fix on node HOCI_BUILD because can access shared 
     cleanWs()
     try {
       checkout scm
+      def kmscsrJson = [
+                          "aws_key_arn": "${params.aws_key_arn}",
+                          "aws_key_spec": "${params.aws_key_spec}",
+                          "cert_common_name": "${params.cert_common_name}",
+                          "cert_country_code": "${params.cert_country_code}",
+                        ]
+
+      writeJSON file: 'cfg/kmscsr.json', json: kmscsrJson, pretty: true
+
       withMaven(maven: 'Maven 3.9.x', jdk: 'OpenJDK 17.x 64 bits') {
         bat "mvn -B clean compile -Daws_key_arn=%params.aws_key_arn% -Daws_key_spec=%params.aws_key_spec% -Dcert_common_namec=%params.cert_common_name% -Dcert_country_code=%params.cert_country_code%"
       }
