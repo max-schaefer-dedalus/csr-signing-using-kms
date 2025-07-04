@@ -17,7 +17,10 @@ node('SHARED&&WINDOWS64') { // fix on node HOCI_BUILD because can access shared 
                         string(description: 'country code (C)',
                                       name: 'cert_country_code',
                                       trim: true,
-                                      defaultValue: 'US')])
+                                      defaultValue: 'US'),
+                        password(defaultValueAsSecret: <object of type hudson.util.Secret>, name: 'aws.accessKeyId'),
+                        password(defaultValueAsSecret: <object of type hudson.util.Secret>, name: 'aws.secretAccessKey'),
+                        password(defaultValueAsSecret: <object of type hudson.util.Secret>, name: 'aws.sessionToken')])
   ])
   env.JENKINS_MAVEN_AGENT_DISABLED = 'true'
   ws {
@@ -35,6 +38,7 @@ node('SHARED&&WINDOWS64') { // fix on node HOCI_BUILD because can access shared 
 
       withMaven(maven: 'Maven 3.9.x', jdk: 'OpenJDK 17.x 64 bits') {
         bat "mvn -B clean compile -Daws_key_arn=%params.aws_key_arn% -Daws_key_spec=%params.aws_key_spec% -Dcert_common_namec=%params.cert_common_name% -Dcert_country_code=%params.cert_country_code%"
+        bat "mvn exec:java -Daws.accessKeyId=%aws.accessKeyId% -Daws.secretAccessKey=%aws.secretAccessKey% -Daws.sessionToken=%aws.sessionToken%"
       }
     } finally {
       cleanWs()
