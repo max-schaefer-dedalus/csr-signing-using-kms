@@ -18,9 +18,9 @@ node('SHARED&&WINDOWS64') { // fix on node HOCI_BUILD because can access shared 
                                       name: 'cert_country_code',
                                       trim: true,
                                       defaultValue: 'US'),
-                        password(defaultValueAsSecret: <object of type hudson.util.Secret>, name: 'aws.accessKeyId'),
-                        password(defaultValueAsSecret: <object of type hudson.util.Secret>, name: 'aws.secretAccessKey'),
-                        password(defaultValueAsSecret: <object of type hudson.util.Secret>, name: 'aws.sessionToken')])
+                        password(name: 'aws.accessKeyId'),
+                        password(name: 'aws.secretAccessKey'),
+                        password(name: 'aws.sessionToken')])
   ])
   env.JENKINS_MAVEN_AGENT_DISABLED = 'true'
   ws {
