@@ -18,10 +18,10 @@ node('SHARED&&WINDOWS64') { // fix on node HOCI_BUILD because can access shared 
                                       name: 'cert_country_code',
                                       trim: true,
                                       defaultValue: 'US'),
-                        string(description: 'country code (C)',
+                        string(description: 'The AWS access key defined in Jenkins' secrets.',
                                       name: 'AWS_ACCESS_KEY',
                                       trim: true,
-                                      defaultValue: 'AKIAWYCJ4LS7M4QMQZMA')])
+                                      defaultValue: 'max-schaefer-iam')])
   ])
   env.JENKINS_MAVEN_AGENT_DISABLED = 'true'
   ws {
