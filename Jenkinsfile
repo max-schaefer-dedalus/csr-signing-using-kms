@@ -18,7 +18,7 @@ node('SHARED&&WINDOWS64') { // fix on node HOCI_BUILD because can access shared 
                                       name: 'cert_country_code',
                                       trim: true,
                                       defaultValue: 'US'),
-                        string(description: 'The AWS access key defined in Jenkins\\' secrets.',
+                        string(description: 'The AWS access key defined in Jenkins secrets.',
                                       name: 'AWS_ACCESS_KEY',
                                       trim: true,
                                       defaultValue: 'max-schaefer-iam')])
