@@ -18,9 +18,10 @@ node('SHARED&&WINDOWS64') { // fix on node HOCI_BUILD because can access shared 
                                       name: 'cert_country_code',
                                       trim: true,
                                       defaultValue: 'US'),
-                        password(name: 'aws_accessKeyId'),
-                        password(name: 'aws_secretAccessKey'),
-                        password(name: 'aws_sessionToken')])
+                        string(description: 'country code (C)',
+                                      name: 'AWS_ACCESS_KEY',
+                                      trim: true,
+                                      defaultValue: 'AKIAWYCJ4LS7M4QMQZMA')])
   ])
   env.JENKINS_MAVEN_AGENT_DISABLED = 'true'
   ws {
@@ -38,8 +39,8 @@ node('SHARED&&WINDOWS64') { // fix on node HOCI_BUILD because can access shared 
 
       withMaven(maven: 'Maven 3.9.x', jdk: 'OpenJDK 17.x 64 bits') {
         bat "mvn -B clean compile -Daws_key_arn=%params.aws_key_arn% -Daws_key_spec=%params.aws_key_spec% -Dcert_common_namec=%params.cert_common_name% -Dcert_country_code=%params.cert_country_code%"
-        wrap([$class: 'MaskPasswordsBuildWrapper', varPasswordPairs: [[var: 'KEY', password: params.aws_accessKeyId]], varMaskRegexes: []]) {
-          bat "mvn exec:java -Daws.accessKeyId=%KEY% -Daws.secretAccessKey=%aws.secretAccessKey% -Daws.sessionToken=%aws.sessionToken%"
+        withCredentials([[ $class: 'AmazonWebServicesCredentialsBinding', credentialsId: params.AWS_ACCESS_KEY]]){
+          bat "mvn exec:java -Daws.accessKeyId=%AWS_ACCESS_KEY_ID% -Daws.secretAccessKey=%AWS_SECRET_ACCESS_KEY%"
         }
       }
     } finally {
