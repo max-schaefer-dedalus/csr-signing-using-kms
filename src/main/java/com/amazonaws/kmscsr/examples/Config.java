@@ -22,9 +22,6 @@ public class Config {
     @SerializedName("cert_organization_name")
     private String certOrganizationName;
 
-    @SerializedName("cert_organizational_unit")
-    private String certOrganizationalUnit;
-
     @SerializedName("cert_locality")
     private String certLocality;
 
@@ -57,9 +54,5 @@ public class Config {
 
     public String getCertState() {
         return certState;
-    }
-
-    public String getCertOrganizationalUnit() {
-        return certOrganizationalUnit;
     }
 }

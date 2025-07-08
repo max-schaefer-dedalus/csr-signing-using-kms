@@ -22,10 +22,6 @@ node('SHARED&&WINDOWS64') { // fix on node HOCI_BUILD because can access shared 
                                       name: 'cert_organization_name',
                                       trim: true,
                                       defaultValue: 'Dedalus Italia S.P.A'),
-                        string(description: 'organizational unit name (OU)',
-                                      name: 'cert_organizational_unit',
-                                      trim: true,
-                                      defaultValue: 'US'),
                         string(description: 'locality (L)',
                                       name: 'cert_locality',
                                       trim: true,
@@ -50,10 +46,8 @@ node('SHARED&&WINDOWS64') { // fix on node HOCI_BUILD because can access shared 
                           "cert_common_name": "${params.cert_common_name}",
                           "cert_country_code": "${params.cert_country_code}",
                           "cert_organization_name": "${params.cert_organization_name}",
-                          "cert_organizational_unit": "${params.cert_organizational_unit}",
                           "cert_locality": "${params.cert_locality}",
-                          "cert_state": "${params.cert_state}",
-                          "cert_email_address": "${params.cert_email_address}"
+                          "cert_state": "${params.cert_state}"
                         ]
 
       writeJSON file: 'cfg/kmscsr.json', json: kmscsrJson, pretty: 2
