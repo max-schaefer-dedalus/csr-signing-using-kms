@@ -53,6 +53,10 @@ public class CsrCreator {
     private String jceSigningAlgorithm;
     private String certCommonName;
     private String certCountryCode;
+    private String certOrganizationalUnit;
+    private String certOrganizationName;
+    private String certLocality;
+    private String certState;
     private String signingAlgorithm;
     private String awsKeySpec;
 
@@ -164,6 +168,18 @@ public class CsrCreator {
         certCountryCode = cfgJsonObj.getCertCountryCode();
         System.out.println("Cert Country Code: " + certCountryCode);
 
+        certOrganizationalUnit = cfgJsonObj.getCertOrganizationalUnit();
+        System.out.println("Cert Organizational Unit: " + certOrganizationalUnit);
+
+        certOrganizationName = cfgJsonObj.getCertOrganizationName();
+        System.out.println("Cert Organization Name: " + certOrganizationName);
+
+        certLocality = cfgJsonObj.getCertLocality();
+        System.out.println("Cert Locality: " + certLocality);
+
+        certState = cfgJsonObj.getCertState();
+        System.out.println("Cert State: " + certState);
+
         // Basic syntax checking of CN, C names for brevity: Value should not contain separators and equal(=) sign
         // Formal Name syntax is defined in: https://www.rfc-editor.org/rfc/rfc1779.html#section-2.3
         Pattern nameRegexValidationPattern = Pattern.compile("[,;=]");
@@ -179,6 +195,38 @@ public class CsrCreator {
         if (countryCodeRegexMatcher.find()) {
             System.out.println(
                     "ERROR: cert_country_code in kmscsr.json contains illegal characters " + certCountryCode);
+            System.out.println("Fix configuration. Exiting ...");
+            System.exit(-1);
+        }
+
+        Matcher localityRegexMatcher = nameRegexValidationPattern.matcher(certLocality);
+        if (localityRegexMatcher.find()) {
+            System.out.println(
+                    "ERROR: cert_locality in kmscsr.json contains illegal characters " + certLocality);
+            System.out.println("Fix configuration. Exiting ...");
+            System.exit(-1);
+        }
+
+        Matcher organizationalUnitRegexMatcher = nameRegexValidationPattern.matcher(certOrganizationalUnit);
+        if (organizationalUnitRegexMatcher.find()) {
+            System.out.println(
+                    "ERROR: cert_organizational_unit in kmscsr.json contains illegal characters " + certOrganizationalUnit);
+            System.out.println("Fix configuration. Exiting ...");
+            System.exit(-1);
+        }
+
+        Matcher organizationalNameRegexMatcher = nameRegexValidationPattern.matcher(certOrganizationName);
+        if (organizationalNameRegexMatcher.find()) {
+            System.out.println(
+                    "ERROR: cert_organization_name in kmscsr.json contains illegal characters " + certOrganizationName);
+            System.out.println("Fix configuration. Exiting ...");
+            System.exit(-1);
+        }
+
+        Matcher stateRegexMatcher = nameRegexValidationPattern.matcher(certState);
+        if (stateRegexMatcher.find()) {
+            System.out.println(
+                    "ERROR: cert_state in kmscsr.json contains illegal characters " + certState);
             System.out.println("Fix configuration. Exiting ...");
             System.exit(-1);
         }
@@ -236,6 +284,11 @@ public class CsrCreator {
         X500NameBuilder nameBuilder = new X500NameBuilder(BCStyle.INSTANCE);
         nameBuilder.addRDN(BCStyle.CN, certCommonName);
         nameBuilder.addRDN(BCStyle.C, certCountryCode);
+        nameBuilder.addRDN(BCStyle.OU, certOrganizationalUnit);
+        nameBuilder.addRDN(BCStyle.O, certOrganizationName);
+        nameBuilder.addRDN(BCStyle.L, certLocality);
+        nameBuilder.addRDN(BCStyle.ST, certState);
+
         JcaPKCS10CertificationRequestBuilder csrBuilder = new JcaPKCS10CertificationRequestBuilder(nameBuilder.build(),
                 publicKey);
 

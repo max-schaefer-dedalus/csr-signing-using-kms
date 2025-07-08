@@ -19,6 +19,18 @@ public class Config {
     @SerializedName("cert_country_code")
     private String certCountryCode;
 
+    @SerializedName("cert_organization_name")
+    private String certOrganizationName;
+
+    @SerializedName("cert_organizational_unit")
+    private String certOrganizationalUnit;
+
+    @SerializedName("cert_locality")
+    private String certLocality;
+
+    @SerializedName("cert_state")
+    private String certState;
+
     public String getAwsKeySpec() {
         return awsKeySpec;
     }
@@ -33,5 +45,21 @@ public class Config {
 
     public String getCertCountryCode() {
         return certCountryCode;
+    }
+
+    public String getCertOrganizationName() {
+        return certOrganizationName;
+    }
+
+    public String getCertLocality() {
+        return certLocality;
+    }
+
+    public String getCertState() {
+        return certState;
+    }
+
+    public String getCertOrganizationalUnit() {
+        return certOrganizationalUnit;
     }
 }
