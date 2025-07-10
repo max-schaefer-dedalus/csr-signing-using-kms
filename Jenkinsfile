@@ -1,6 +1,6 @@
 #!groovy
 
-node('SHARED&&WINDOWS64') { // fix on node HOCI_BUILD because can access shared dir only via axiaz
+node('SHARED&&WINDOWS64') {
   properties([
             buildDiscarder(logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '', daysToKeepStr: '', numToKeepStr: '10')),
             disableConcurrentBuilds(),
