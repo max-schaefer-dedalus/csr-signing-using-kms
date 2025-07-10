@@ -67,7 +67,7 @@ node('SHARED&&WINDOWS64') { // fix on node HOCI_BUILD because can access shared 
             bat "mvn exec:java -Daws.accessKeyId=%AWS_ACCESS_KEY_ID% -Daws.secretAccessKey=%AWS_SECRET_ACCESS_KEY%"
           }
           archiveArtifacts allowEmptyArchive: true, artifacts: 'csr.pem', followSymlinks: false, onlyIfSuccessful: true
-          build.description = "<a href='${BUILD_URL}/csr.pem'>csr.pem</a>"
+          currentBuild.description = "<a href='${BUILD_URL}/csr.pem'>csr.pem</a>"
         }
       }
     } finally {
