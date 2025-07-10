@@ -37,31 +37,43 @@ node('SHARED&&WINDOWS64') { // fix on node HOCI_BUILD because can access shared 
   ])
   env.JENKINS_MAVEN_AGENT_DISABLED = 'true'
   ws {
-    cleanWs()
+    stage("CLEANUP") {
+      cleanWs()
+    }
     try {
-      checkout scm
-      def kmscsrJson = [
-                          "aws_key_arn": "${params.aws_key_arn}",
-                          "aws_key_spec": "${params.aws_key_spec}",
-                          "cert_common_name": "${params.cert_common_name}",
-                          "cert_country_code": "${params.cert_country_code}",
-                          "cert_organization_name": "${params.cert_organization_name}",
-                          "cert_locality": "${params.cert_locality}",
-                          "cert_state": "${params.cert_state}"
-                        ]
+      stage("CHECKOUT") {
+       checkout scm
+      }
+      stage("CREATE PARAMETERS FILE") {}
+        def kmscsrJson = [
+                            "aws_key_arn": "${params.aws_key_arn}",
+                            "aws_key_spec": "${params.aws_key_spec}",
+                            "cert_common_name": "${params.cert_common_name}",
+                            "cert_country_code": "${params.cert_country_code}",
+                            "cert_organization_name": "${params.cert_organization_name}",
+                            "cert_locality": "${params.cert_locality}",
+                            "cert_state": "${params.cert_state}"
+                          ]
 
-      writeJSON file: 'cfg/kmscsr.json', json: kmscsrJson, pretty: 2
+        writeJSON file: 'cfg/kmscsr.json', json: kmscsrJson, pretty: 2
+      }
 
       withMaven(maven: 'Maven 3.9.x', jdk: 'OpenJDK 17.x 64 bits') {
-        bat "mvn -B clean compile -Daws_key_arn=%params.aws_key_arn% -Daws_key_spec=%params.aws_key_spec% -Dcert_common_namec=%params.cert_common_name% -Dcert_country_code=%params.cert_country_code%"
-        withCredentials([[ $class: 'AmazonWebServicesCredentialsBinding', credentialsId: params.AWS_ACCESS_KEY]]){
-          bat "mvn exec:java -Daws.accessKeyId=%AWS_ACCESS_KEY_ID% -Daws.secretAccessKey=%AWS_SECRET_ACCESS_KEY%"
+        stage("BUILD") {
+          bat "mvn -B clean compile -Daws_key_arn=%params.aws_key_arn% -Daws_key_spec=%params.aws_key_spec% -Dcert_common_namec=%params.cert_common_name% -Dcert_country_code=%params.cert_country_code%"
         }
-        archiveArtifacts allowEmptyArchive: true, artifacts: 'csr.pem', followSymlinks: false, onlyIfSuccessful: true
-        build.description = <a href="${BUILD_URL}/csr.pem/">csr.pem</a>
+        stage("CREATE CSR") {
+          withCredentials([[ $class: 'AmazonWebServicesCredentialsBinding', credentialsId: params.AWS_ACCESS_KEY]]){
+            bat "mvn exec:java -Daws.accessKeyId=%AWS_ACCESS_KEY_ID% -Daws.secretAccessKey=%AWS_SECRET_ACCESS_KEY%"
+          }
+          archiveArtifacts allowEmptyArchive: true, artifacts: 'csr.pem', followSymlinks: false, onlyIfSuccessful: true
+          build.description = <a href="${BUILD_URL}/csr.pem/">csr.pem</a>
+        }
       }
     } finally {
-      cleanWs()
+      stage("CLEANUP") {
+        cleanWs()
+      }
     }
   }
 }
