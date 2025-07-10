@@ -78,7 +78,6 @@ public class CsrCreator implements Closeable {
             System.out.println("PEM formatted CSR:\n" + pemFormattedCsr);
             Files.writeString(Paths.get("csr.pem"), pemFormattedCsr);
         }
-        System.exit(0);
     }
 
     /**
@@ -100,8 +99,9 @@ public class CsrCreator implements Closeable {
 
     /**
      * Reads config file <project-root>/cfg/kmscsr.json
+     * @throws IOException
      */
-    private void readConfig() {
+    private void readConfig() throws IOException {
         final String userDir = System.getProperty("user.dir");
         System.out.println("Project Directory: " + userDir);
         final String cfgFilePathName = userDir + "/cfg/kmscsr.json";
@@ -116,7 +116,7 @@ public class CsrCreator implements Closeable {
             System.out.println("ERROR: Error reading config file kmscsr.json.\n" +
                     "Please ensure that the file is present under <project-root>/cfg/kmscsr.json. Exiting ...");
             e.printStackTrace();
-            System.exit(-1);
+            throw e;
         }
 
         System.out.println("Found config file " + cfgFilePathName);
@@ -129,7 +129,7 @@ public class CsrCreator implements Closeable {
         }
         catch (JsonSyntaxException e) {
             System.out.println("ERROR: Invalid JSON syntax in <project-root>/cfg/kmscsr.json. Exiting ...\n");
-            System.exit(-1);
+            throw e;
         }
 
         // Extract signing algorithm from config
@@ -148,9 +148,7 @@ public class CsrCreator implements Closeable {
         // Key ARN format: "arn:aws:kms:us-east-1:012345678901:key/some-key-id"
         final Optional<Arn> awsKmsKeyArn = Arn.parse(cfgJsonObj.getAwsKeyArn());
         if (!awsKmsKeyArn.isPresent()) {
-            System.out.println("ERROR: Key ARN provided in config could not be parsed: " + cfgJsonObj.getAwsKeyArn());
-            System.out.println("Fix configuration. Exiting ...");
-            System.exit(-1);
+            throw new IllegalArgumentException("ERROR: Key ARN provided in config could not be parsed: " + cfgJsonObj.getAwsKeyArn() + "\nFix configuration. Exiting ...");
         }
 
         kmsRegion = awsKmsKeyArn.get().region();
@@ -185,41 +183,31 @@ public class CsrCreator implements Closeable {
 
         Matcher commonNameRegexMatcher = nameRegexValidationPattern.matcher(certCommonName);
         if (commonNameRegexMatcher.find()) {
-            System.out.println("ERROR: cert_common_name in kmscsr.json contains illegal characters " + certCommonName);
-            System.out.println("Fix configuration. Exiting ...");
-            System.exit(-1);
+            throw new IllegalArgumentException("ERROR: cert_common_name in kmscsr.json contains illegal characters " + certCommonName + "\nFix configuration. Exiting ...");
         }
 
         Matcher countryCodeRegexMatcher = nameRegexValidationPattern.matcher(certCountryCode);
         if (countryCodeRegexMatcher.find()) {
-            System.out.println(
-                    "ERROR: cert_country_code in kmscsr.json contains illegal characters " + certCountryCode);
-            System.out.println("Fix configuration. Exiting ...");
-            System.exit(-1);
+            throw new IllegalArgumentException(
+                    "ERROR: cert_country_code in kmscsr.json contains illegal characters " + certCountryCode + "\nFix configuration. Exiting ...");
         }
 
         Matcher localityRegexMatcher = nameRegexValidationPattern.matcher(certLocality);
         if (localityRegexMatcher.find()) {
-            System.out.println(
-                    "ERROR: cert_locality in kmscsr.json contains illegal characters " + certLocality);
-            System.out.println("Fix configuration. Exiting ...");
-            System.exit(-1);
+            throw new IllegalArgumentException(
+                    "ERROR: cert_locality in kmscsr.json contains illegal characters " + certLocality + "\nFix configuration. Exiting ...");
         }
 
         Matcher organizationalNameRegexMatcher = nameRegexValidationPattern.matcher(certOrganizationName);
         if (organizationalNameRegexMatcher.find()) {
-            System.out.println(
-                    "ERROR: cert_organization_name in kmscsr.json contains illegal characters " + certOrganizationName);
-            System.out.println("Fix configuration. Exiting ...");
-            System.exit(-1);
+            throw new IllegalArgumentException(
+                    "ERROR: cert_organization_name in kmscsr.json contains illegal characters " + certOrganizationName + "\nFix configuration. Exiting ...");
         }
 
         Matcher stateRegexMatcher = nameRegexValidationPattern.matcher(certState);
         if (stateRegexMatcher.find()) {
-            System.out.println(
-                    "ERROR: cert_state in kmscsr.json contains illegal characters " + certState);
-            System.out.println("Fix configuration. Exiting ...");
-            System.exit(-1);
+            throw new IllegalArgumentException(
+                    "ERROR: cert_state in kmscsr.json contains illegal characters " + certState + "\nFix configuration. Exiting ...");
         }
     }
 
@@ -251,8 +239,9 @@ public class CsrCreator implements Closeable {
 
     /**
      * Creates a CSR object and gets it signed by AWS KMS asymmetric key.
+     * @throws IOException
      */
-    private String createAndSignCsr() {
+    private String createAndSignCsr() throws IOException {
         // Encode public key bytes to ASN.1 and generate a JCE compliant PublicKey object
         System.out.println("Encoding public key in ASN.1 format ...");
         final X509EncodedKeySpec publicKeySpec = new X509EncodedKeySpec(publicKeyBytes);
@@ -289,7 +278,7 @@ public class CsrCreator implements Closeable {
         catch (IOException e) {
             System.out.println("ERROR: Potential error in certificate parameters in config. Exiting ...");
             e.printStackTrace();
-            System.exit(-1);
+            throw e;
         }
         csrBuilder.addAttribute(PKCSObjectIdentifiers.pkcs_9_at_extensionRequest, extensionsGenerator.generate());
 
@@ -307,7 +296,7 @@ public class CsrCreator implements Closeable {
         catch (IOException e) {
             System.out.println("ERROR: Internal program error in PEM formatting. Exiting ...");
             e.printStackTrace();
-            System.exit(-1);
+            throw e;
         }
 
         return csrStringWriter.toString();
