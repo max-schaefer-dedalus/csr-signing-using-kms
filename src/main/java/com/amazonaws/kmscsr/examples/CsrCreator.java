@@ -3,6 +3,7 @@
 
 package com.amazonaws.kmscsr.examples;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
@@ -46,7 +47,7 @@ import software.amazon.awssdk.services.kms.endpoints.internal.Arn;
 import software.amazon.awssdk.services.kms.model.GetPublicKeyRequest;
 
 
-public class CsrCreator {
+public class CsrCreator implements Closeable {
 
     private KmsClient awsKmsClient;
     private String keyId;
@@ -70,14 +71,13 @@ public class CsrCreator {
     public static void main(final String[] args) throws IOException {
         System.out.println("Running CSR creation and signing using AWS KMS util ... ");
 
-        final CsrCreator csrCreator = new CsrCreator();
-        csrCreator.readConfig();
-        csrCreator.fetchAwsKmsPublicKey();
-        final String pemFormattedCsr = csrCreator.createAndSignCsr();
-        System.out.println("PEM formatted CSR:\n" + pemFormattedCsr);
-        Files.writeString(Paths.get("csr.pem"), pemFormattedCsr);
-
-        csrCreator.awsKmsClient.close();
+        try (final CsrCreator csrCreator = new CsrCreator()) {
+            csrCreator.readConfig();
+            csrCreator.fetchAwsKmsPublicKey();
+            final String pemFormattedCsr = csrCreator.createAndSignCsr();
+            System.out.println("PEM formatted CSR:\n" + pemFormattedCsr);
+            Files.writeString(Paths.get("csr.pem"), pemFormattedCsr);
+        }
         System.exit(0);
     }
 
@@ -311,5 +311,10 @@ public class CsrCreator {
         }
 
         return csrStringWriter.toString();
+    }
+
+    @Override
+    public void close() throws IOException {
+        awsKmsClient.close();
     }
 }
