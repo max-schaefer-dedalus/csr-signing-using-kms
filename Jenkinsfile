@@ -44,7 +44,7 @@ node('SHARED&&WINDOWS64') { // fix on node HOCI_BUILD because can access shared 
       stage("CHECKOUT") {
        checkout scm
       }
-      stage("CREATE PARAMETERS FILE") {}
+      stage("CREATE PARAMETERS FILE") {
         def kmscsrJson = [
                             "aws_key_arn": "${params.aws_key_arn}",
                             "aws_key_spec": "${params.aws_key_spec}",
