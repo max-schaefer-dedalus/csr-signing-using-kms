@@ -3,29 +3,6 @@
 
 package com.amazonaws.kmscsr.examples;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonSyntaxException;
-import org.apache.log4j.BasicConfigurator;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
-import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
-import org.bouncycastle.asn1.x500.X500NameBuilder;
-import org.bouncycastle.asn1.x500.style.BCStyle;
-import org.bouncycastle.asn1.x509.BasicConstraints;
-import org.bouncycastle.asn1.x509.Extension;
-import org.bouncycastle.asn1.x509.ExtensionsGenerator;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import org.bouncycastle.openssl.MiscPEMGenerator;
-import org.bouncycastle.pkcs.PKCS10CertificationRequest;
-import org.bouncycastle.pkcs.jcajce.JcaPKCS10CertificationRequestBuilder;
-import org.bouncycastle.util.io.pem.PemObjectGenerator;
-import org.bouncycastle.util.io.pem.PemWriter;
-import software.amazon.awssdk.core.SdkBytes;
-import software.amazon.awssdk.regions.Region;
-import software.amazon.awssdk.services.kms.KmsClient;
-import software.amazon.awssdk.services.kms.endpoints.internal.Arn;
-import software.amazon.awssdk.services.kms.model.GetPublicKeyRequest;
-
 import java.io.IOException;
 import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
@@ -42,6 +19,31 @@ import java.util.List;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import org.apache.log4j.BasicConfigurator;
+import org.apache.log4j.Level;
+import org.apache.log4j.Logger;
+import org.bouncycastle.asn1.pkcs.PKCSObjectIdentifiers;
+import org.bouncycastle.asn1.x500.X500NameBuilder;
+import org.bouncycastle.asn1.x500.style.BCStyle;
+import org.bouncycastle.asn1.x509.BasicConstraints;
+import org.bouncycastle.asn1.x509.Extension;
+import org.bouncycastle.asn1.x509.ExtensionsGenerator;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.bouncycastle.openssl.MiscPEMGenerator;
+import org.bouncycastle.pkcs.PKCS10CertificationRequest;
+import org.bouncycastle.pkcs.jcajce.JcaPKCS10CertificationRequestBuilder;
+import org.bouncycastle.util.io.pem.PemObjectGenerator;
+import org.bouncycastle.util.io.pem.PemWriter;
+
+import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
+
+import software.amazon.awssdk.core.SdkBytes;
+import software.amazon.awssdk.regions.Region;
+import software.amazon.awssdk.services.kms.KmsClient;
+import software.amazon.awssdk.services.kms.endpoints.internal.Arn;
+import software.amazon.awssdk.services.kms.model.GetPublicKeyRequest;
 
 
 public class CsrCreator {
@@ -65,7 +67,7 @@ public class CsrCreator {
         Security.addProvider(new BouncyCastleProvider());
     }
 
-    public static void main(final String[] args) {
+    public static void main(final String[] args) throws IOException {
         System.out.println("Running CSR creation and signing using AWS KMS util ... ");
 
         final CsrCreator csrCreator = new CsrCreator();
@@ -73,6 +75,7 @@ public class CsrCreator {
         csrCreator.fetchAwsKmsPublicKey();
         final String pemFormattedCsr = csrCreator.createAndSignCsr();
         System.out.println("PEM formatted CSR:\n" + pemFormattedCsr);
+        Files.writeString(Paths.get("csr.pem"), pemFormattedCsr);
 
         csrCreator.awsKmsClient.close();
         System.exit(0);

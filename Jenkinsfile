@@ -33,7 +33,7 @@ node('SHARED&&WINDOWS64') { // fix on node HOCI_BUILD because can access shared 
                         string(description: 'The AWS access key defined in Jenkins secrets.',
                                       name: 'AWS_ACCESS_KEY',
                                       trim: true,
-                                      defaultValue: 'max-schaefer-iam')])
+                                      defaultValue: 'CIUSER_Code_Signing_PEnT_GlobalSign_CI')])
   ])
   env.JENKINS_MAVEN_AGENT_DISABLED = 'true'
   ws {
@@ -57,6 +57,8 @@ node('SHARED&&WINDOWS64') { // fix on node HOCI_BUILD because can access shared 
         withCredentials([[ $class: 'AmazonWebServicesCredentialsBinding', credentialsId: params.AWS_ACCESS_KEY]]){
           bat "mvn exec:java -Daws.accessKeyId=%AWS_ACCESS_KEY_ID% -Daws.secretAccessKey=%AWS_SECRET_ACCESS_KEY%"
         }
+        archiveArtifacts allowEmptyArchive: true, artifacts: 'csr.pem', followSymlinks: false, onlyIfSuccessful: true
+        build.description = <a href="${BUILD_URL}/csr.pem/">csr.pem</a>
       }
     } finally {
       cleanWs()
