@@ -5,7 +5,7 @@ node('SHARED&&WINDOWS64') {
             buildDiscarder(logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '', daysToKeepStr: '', numToKeepStr: '10')),
             disableConcurrentBuilds(),
             disableResume(),
-            parameters([string(description: 'AWS KMS Key ARN',
+            parameters([string(description: 'AWS KMS Key ARN e.g. arn:aws:kms:eu-central-1:009160067974:key/d13d2510-22fd-4a72-b9c0-068ecde59d88',
                                       name: 'aws_key_arn',
                                       trim: true,
                                       defaultValue: 'arn:aws:kms:your-aws-region:012345678901:key/your-key-id'),
